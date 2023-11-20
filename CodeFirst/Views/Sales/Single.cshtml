@@ -1,0 +1,70 @@
+﻿@model CodeFirst.ViewModels.VmSale
+@{
+    ViewBag.Title = "Single";
+    var listSaleMaster = ViewData["List"] as List<CodeFirst.Models.SaleMaster>;
+    var listSaleDetail = ViewData["L"] as List<CodeFirst.Models.SaleDetail>;
+}
+
+<h2>SPA with Razor Ajax</h2>
+
+@Html.Partial("PartialView")
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Customer Name</th>
+        <th>Address</th>
+        <th>Gender</th>
+        <th>Product Type</th>
+        <th>Photo</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    @foreach (var item in listSaleMaster)
+    {
+        <tr>
+            <td>@item.CreateDate</td>
+            <td>@item.CustomerName</td>
+            <td>@item.CustomerAddress</td>
+            <td>@item.Gender</td>
+            <td>@item.ProductType</td>
+            <td><img src="@item.Photo" width="120" height="150"></td>
+            <td><a href="/Sales/Single?id=@item.SaleId">Edit</a></td>
+            <td><a href="/Sales/SingleDelete?id=@item.SaleId" onclick="return confirm('Are you sure to delete?')">Delete</a></td>
+        </tr>
+    }
+</table>
+<table>
+    <tr>
+        <th>ProductName</th>
+        <th>Price</th>
+        <th>Quantity</th>
+    </tr>
+    @foreach (var item in listSaleDetail)
+    {
+        <tr>
+            <td>@item.ProductName</td>
+            <td>@item.Price</td>
+            <td>@item.Qty</td>
+        </tr>
+    }
+</table>
+
+<script>
+    var indexItem = @listSaleMaster.Count;
+    function addItem() {
+        indexItem += 1;
+        var TRs = `<tr id="tr_${indexItem}">
+                        <td><input type="text" id="ProductName_${indexItem}" name="ProductName" value="" /></td>
+                        <td><input type="text" id="UnitPrice_${indexItem}" name="UnitPrice" value="" style="text-align:right" onkeydown="calculatePrice(${indexItem});" /></td>
+                        <td><input type="text" id="Qty_${indexItem}" name="Qty" value="" style="text-align:right" onkeydown="calculatePrice(${indexItem});" /></td>
+                        <td><input type="text" id="Price_${indexItem}" name="Price" value="" style="text-align:right" /></td>
+                        <td><a href="javascript:void(0)" onclick="removeItem(${indexItem})">Remove</a></td>
+                    </tr>`;
+        document.getElementById('tSD').innerHTML += TRs;
+    }
+
+    function removeItem(id) {
+        document.getElementById(`tr_${id}`).remove();
+    }
+</script>

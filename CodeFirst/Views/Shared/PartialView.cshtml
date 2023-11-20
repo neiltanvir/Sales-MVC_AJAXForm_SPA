@@ -1,0 +1,97 @@
+﻿@model CodeFirst.ViewModels.VmSale
+@{
+    ViewBag.Title = "Single";
+    var listSaleMaster = ViewData["List"] as List<CodeFirst.Models.SaleMaster>;
+    var CreateDate = Model.CreateDate == null ? "" : Convert.ToDateTime(Model.CreateDate).ToString("yyyy-MM-dd");
+    var ButtonValue = Model.SaleId > 0 ? "Update" : "Add";
+    var ButtonClass = Model.SaleId > 0 ? "primary" : "success";
+    var radio1 = Model.Gender == "Male" ? "selected" : "";
+    var radio2 = Model.Gender == "Female" ? "selected" : "";
+    var photo = (Model.Photo != null) ? Model.Photo : null;
+}
+
+@using (Ajax.BeginForm(
+        "Single",
+        "Sales",
+        new AjaxOptions
+        {
+            HttpMethod = "POST"
+        }
+    , new { enctype = "multipart/form-data" }
+    ))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SaleId)
+    @Html.LabelFor(m => m.CreateDate)
+    <br />
+    <input type="date" id="CreateDate" name="CreateDate" value="@CreateDate" />
+    <br />
+    @Html.LabelFor(m => m.CustomerName)
+    <br />
+    @Html.TextBoxFor(m => m.CustomerName)
+    <br />
+    @Html.LabelFor(m => m.CustomerAddress)
+    <br />
+    @Html.TextBoxFor(m => m.CustomerAddress)
+    <br />
+    <div>
+        @Html.LabelFor(m => m.Gender)
+        <div>
+            @Html.RadioButtonFor(m => m.Gender, "Male")
+            @Html.LabelFor(m => m.Gender, "Male") <br />
+            @Html.RadioButtonFor(m => m.Gender, "Female")
+            @Html.LabelFor(m => m.Gender, "Female")
+        </div>
+    </div>
+    @Html.LabelFor(m => m.ProductType)
+    <br />
+    @Html.DropDownList("SelectedValue", (IEnumerable<SelectListItem>)ViewData["item"], (Model.ProductType.IsEmpty()) ? "Choose an Option" : Model.ProductType)
+    <br />
+    <div class="form-group">
+        @Html.LabelFor(m => m.Photo, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="file" name="img" />
+        </div>
+    </div>
+    <br />
+    <button type="submit" id="btnUpdate" class="btn btn-@ButtonClass">@ButtonValue</button>
+    <a href="/Sales/Single">Reset</a>
+    <br />
+    <br />
+    <div class="col-md-6">
+        <table>
+            <thead>
+                <tr>
+                    <th>ProductName</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>
+                        <button type="button" onclick="addItem();" class="btn btn-info">AddItem</button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="tSD">
+                @foreach (var item in Model.SaleDetails)
+                {
+                    var UnitPrice = item.Price / item.Qty;
+                    <tr>
+                        <td><input type="text" name="ProductName" value="@item.ProductName" /></td>
+                        <td><input type="text" name="UnitPrice" value="@UnitPrice" style="text-align:right" onkeydown="calculatePrice(@item.Price, @item.Qty);" /></td>
+                        <td><input type="text" name="Qty" value="@item.Qty" style="text-align:right" onkeydown="calculatePrice(@item.Price, @item.Qty);" /></td>
+                        <td><input type="text" name="Price" value="@item.Price" style="text-align:right" /></td>
+                        <td><a href="javascript:void(0)" onclick="removeItem();">Remove</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@*<script>
+        function calculatePrice(price, qty) {
+            var total = price * qty;
+            // Your calculation logic
+        }
+    </script>*@
+
